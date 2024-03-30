@@ -8,6 +8,15 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#define KFIFO_ARRAY(name, type) \
+    struct name {               \
+        uint32_t cap;           \
+        uint32_t mask;          \
+        uint32_t head;          \
+        uint32_t tail;          \
+        type array[];           \
+    }
+
 #define _KFIFO(name, type) \
     struct name {          \
         uint32_t cap;      \
@@ -35,6 +44,22 @@
         (kfifo)->tail = 0;                                              \
         (kfifo)->array =                                                \
         (typeof((kfifo)->array))calloc(cap, sizeof((kfifo)->array[0])); \
+    } while(0)
+
+#define KFIFO_ARRAY_INIT(kfifo, capacity) \
+    do {                                  \
+        uint32_t cap = (capacity);        \
+        cap--;                            \
+        cap |= cap >> 1;                  \
+        cap |= cap >> 2;                  \
+        cap |= cap >> 4;                  \
+        cap |= cap >> 8;                  \
+        cap |= cap >> 16;                 \
+        cap++;                            \
+        (kfifo)->cap = cap;               \
+        (kfifo)->mask = cap - 1;          \
+        (kfifo)->head = 0;                \
+        (kfifo)->tail = 0;                \
     } while(0)
 
 #define KFIFO_FREE(kfifo) free((kfifo)->array)

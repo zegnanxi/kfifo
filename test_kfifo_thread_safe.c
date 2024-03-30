@@ -48,6 +48,7 @@ int main(void) {
     _KFIFO(kfifo, int) kfifo;
     KFIFO_INIT(&kfifo, 16);
     pthread_t producer, consumer;
+    printf("hehe\n");
     pthread_create(&producer, NULL, producer_thread, &kfifo);
     pthread_create(&consumer, NULL, consumer_thread, &kfifo);
     pthread_join(producer, NULL);
